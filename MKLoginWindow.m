@@ -153,9 +153,10 @@
 		//instead we'll break up the string at the = and load everything after the = as the JSON object
 		//NSArray *array = [urlString componentsSeparatedByString:@"="];
 		NSArray *array = [urlString componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"=&"]];
-		if([array objectAtIndex:1] != nil)
+		if([array lastObject] != nil)
 		{
-			NSString *decodedParameters = [[array objectAtIndex:1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+			//session data is now at the end of the return string, fixed by Stefan
+			NSString *decodedParameters = [[array lastObject] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 			DLog(@"parameters: %@", decodedParameters);
 			id sessionInfo = [decodedParameters JSONValue];
 			DLog(@"session info: %@", [sessionInfo description]);
