@@ -26,6 +26,7 @@
 #import "MKFacebookRequest.h"
 
 NSString *MKAPIServerURL = @"http://api.facebook.com/restserver.php";
+NSString *MKVideoAPIServerURL = @"http://api-video.facebook.com/restserver.php";
 NSString *MKLoginUrl = @"http://www.facebook.com/login.php";
 NSString *MKExtendPermissionsURL = @"http://www.facebook.com/connect/prompt_permissions.php";
 NSString *MKFacebookAPIVersion = @"1.0";

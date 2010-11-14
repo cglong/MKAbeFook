@@ -19,6 +19,8 @@
 
 - (id)initWithDelegate:(id)delegate selector:(SEL)selector{
 	self = [super initWithDelegate:delegate selector:selector];
+	[requestURL release];
+	requestURL = [[NSURL URLWithString:MKVideoAPIServerURL] retain];
 	return self;
 }
 
@@ -31,6 +33,7 @@
 
 - (void)videoUpload:(NSData *)video title:(NSString *)title description:(NSString *)description{
 	[self setURLRequestType:MKFacebookRequestTypePOST];
+	self.method=@"video.upload";
 	NSMutableDictionary *parameters = [[NSMutableDictionary alloc] init];
 	[parameters setObject:video forKey:@"video"];
 	[parameters setValue:title forKey:@"title"];

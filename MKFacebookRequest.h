@@ -76,7 +76,7 @@ typedef int MKFacebookRequestResponseFormat;
 	MKFacebookRequestType _urlRequestType;
 	MKFacebookRequestResponseFormat responseFormat;
 	NSMutableDictionary *_parameters;
-	NSURL *_requestURL;
+	NSURL *requestURL;
 	BOOL _displayAPIErrorAlert;
 	int _numberOfRequestAttempts;
 	int _requestAttemptCount;
