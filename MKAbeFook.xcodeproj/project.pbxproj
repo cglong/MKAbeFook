@@ -68,6 +68,7 @@
 		27D8B0AB0AE6FFB2007941CF /* MKFacebook.m in Sources */ = {isa = PBXBuildFile; fileRef = 27D8B0A90AE6FFB2007941CF /* MKFacebook.m */; };
 		27D8B0AD0AE6FFBC007941CF /* LoginWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = 27D8B0AC0AE6FFBC007941CF /* LoginWindow.nib */; };
 		27D8B0AF0AE7000C007941CF /* MKAbeFook.h in Headers */ = {isa = PBXBuildFile; fileRef = 27D8B0AE0AE7000C007941CF /* MKAbeFook.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		27F59BF6129360590090474A /* login_failed.html in Resources */ = {isa = PBXBuildFile; fileRef = 27F59BF5129360590090474A /* login_failed.html */; };
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -124,6 +125,7 @@
 		27D8B0A90AE6FFB2007941CF /* MKFacebook.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = MKFacebook.m; sourceTree = "<group>"; };
 		27D8B0AC0AE6FFBC007941CF /* LoginWindow.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = LoginWindow.nib; sourceTree = "<group>"; };
 		27D8B0AE0AE7000C007941CF /* MKAbeFook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKAbeFook.h; sourceTree = "<group>"; };
+		27F59BF5129360590090474A /* login_failed.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = login_failed.html; sourceTree = "<group>"; };
 		32DBCF5E0370ADEE00C91783 /* MKAbeFook_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKAbeFook_Prefix.pch; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* MKAbeFook.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MKAbeFook.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -178,6 +180,7 @@
 		089C1665FE841158C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				27F59BF5129360590090474A /* login_failed.html */,
 				273646D7106F3B720044AEB3 /* login_successful.html */,
 				8DC2EF5A0486A6940098B216 /* Info.plist */,
 				089C1666FE841158C02AAC07 /* InfoPlist.strings */,
@@ -361,7 +364,14 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "MKAbeFook" */;
 			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* MKAbeFook */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
 			projectDirPath = "";
@@ -382,6 +392,7 @@
 				27D8B0AD0AE6FFBC007941CF /* LoginWindow.nib in Resources */,
 				2784C16D0E34D81E00AD28B1 /* ErrorWindow.nib in Resources */,
 				273646D8106F3B720044AEB3 /* login_successful.html in Resources */,
+				27F59BF6129360590090474A /* login_failed.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -448,10 +459,8 @@
 		1DEB91AE08733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -478,10 +487,8 @@
 		1DEB91AF08733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
 				DEAD_CODE_STRIPPING = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;

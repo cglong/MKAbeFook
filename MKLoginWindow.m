@@ -109,6 +109,10 @@
 
 	if (self.runModally == YES) {
 		[NSApp stopModal];
+	}else if (self._loginWindowIsSheet == YES)
+	{
+		[[self window] orderOut:[aNotification object]];
+		[NSApp endSheet:[self window] returnCode:1];
 	}
 
 	//this is not the proper way to do this, someone please fix it.
@@ -142,13 +146,9 @@
 	//we need to do some extra things when a user logs in successfully
 	if([urlString hasPrefix:@"http://www.facebook.com/connect/login_success.html"])
 	{
-		//display a custom successful login message that doesn't require an external host
-		//TODO: let others provide their own local success html file without modifying the framework default
-		NSString *fwp = [[NSBundle mainBundle] privateFrameworksPath];
-		NSString *next = [NSString stringWithFormat:@"%@/MKAbeFook.framework/Resources/login_successful.html", fwp];
-		[self loadURL:[NSURL fileURLWithPath:[next stringByExpandingTildeInPath]]];
+		// facebook returns with this URL even if you do not allow PhotoPresenter access with extended permissions
+		// no sessionInfo is returnd in the latter case
 		
-		DLog(@"user was successfully logged in, should now load %@", next);
 		//unfortunately we can't call parametersString on the url that facebook returns for us to load (not sure why...)
 		//instead we'll break up the string at the = and load everything after the = as the JSON object
 		//NSArray *array = [urlString componentsSeparatedByString:@"="];
@@ -160,26 +160,46 @@
 			DLog(@"parameters: %@", decodedParameters);
 			id sessionInfo = [decodedParameters JSONValue];
 			DLog(@"session info: %@", [sessionInfo description]);
-			[[MKFacebookSession sharedMKFacebookSession] saveSession:sessionInfo];
-		}else {
-			DLog(@"failed to save session info returned by facebook....");
 			
+			if (sessionInfo)	// login successful with extended permissions
+			{
+				[[MKFacebookSession sharedMKFacebookSession] saveSession:sessionInfo];
+				
+				//display a custom successful login message that doesn't require an external host
+				NSString *next = [[NSBundle mainBundle] pathForResource:@"FacebookLoginSuccess" ofType:@"html"];
+				if (! next)
+				{
+					NSString *fwp = [[NSBundle mainBundle] privateFrameworksPath];
+					next = [NSString stringWithFormat:@"%@/MKAbeFook.framework/Resources/login_successful.html", fwp];
+				}
+				[self loadURL:[NSURL fileURLWithPath:[next stringByExpandingTildeInPath]]];
+				
+				//finally call userLoginSuccessful
+				if([self._delegate respondsToSelector:@selector(userLoginSuccessful)])
+					[self._delegate performSelector:@selector(userLoginSuccessful)];
+			}
+			else
+			{
+				DLog(@"failed to save session info returned by facebook....");
+				[self closeWindow:self];
+			}
 		}
-		
-		//finally call userLoginSuccessful
-		if([self._delegate respondsToSelector:@selector(userLoginSuccessful)])
-			[self._delegate performSelector:@selector(userLoginSuccessful)];
+		else
+		{
+			DLog(@"failed to save session info returned by facebook....");
+		}
 	}
-	
-	
 	
 	if([urlString hasPrefix:@"http://www.facebook.com/connect/login_failure.html"])
 	{
 		//display a custom failed login message that doesn't require an external host
-		//TODO: let developers provide their own local success html file without modifying the framework default
-		NSString *fwp = [[NSBundle mainBundle] privateFrameworksPath];
-		NSString *next = [NSString stringWithFormat:@"%@/MKAbeFook.framework/Resources/login_failed.html", fwp];
-		[self loadURL:[NSURL URLWithString:next]];
+		NSString *next = [[NSBundle mainBundle] pathForResource:@"FacebookLoginFailed" ofType:@"html"];
+		if (! next)
+		{
+			NSString *fwp = [[NSBundle mainBundle] privateFrameworksPath];
+			next = [NSString stringWithFormat:@"%@/MKAbeFook.framework/Resources/login_failed.html", fwp];
+		}
+		[self loadURL:[NSURL fileURLWithPath:[next stringByExpandingTildeInPath]]];
 		
 	}
 	

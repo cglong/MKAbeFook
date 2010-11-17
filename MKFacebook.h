@@ -117,6 +117,9 @@ extern NSString *MKFacebookDefaultResponseFormat;
  
  Tries to load existing session. If no session is available a login window will be displayed. If a user logs in successfully the session will automatically be saved to the application NSUserDefaults. If you need to display a login window while a modal window active use loginUsingModalWindow.
  
+ 
+ You can customize the message displayed in the login window after a successful or failed login attempt by creating "FacebookLoginSuccess.html" and "FacebookLoginFailed.html" files and placing them in the Resources folder of your application.
+ 
  @see loginUsingModalWindow 
  @see loginWithPermissions:forSheet:
  
