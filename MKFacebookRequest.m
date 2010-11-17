@@ -64,7 +64,7 @@ NSString *MKFacebookRequestActivityEnded = @"MKFacebookRequestActivityEnded";
 		_parameters = [[NSMutableDictionary alloc] init];
 		_urlRequestType = MKFacebookRequestTypePOST;
 		responseFormat = MKFacebookRequestResponseFormatXML;
-		_requestURL = [[NSURL URLWithString:MKAPIServerURL] retain];
+		requestURL = [[NSURL URLWithString:MKAPIServerURL] retain];
 		_displayAPIErrorAlert = NO;
 		_numberOfRequestAttempts = 5;
 		_session = [MKFacebookSession sharedMKFacebookSession];
@@ -112,7 +112,7 @@ NSString *MKFacebookRequestActivityEnded = @"MKFacebookRequestActivityEnded";
 
 -(void)dealloc
 {
-	[_requestURL release];
+	[requestURL release];
 	[_parameters release];
 	[_responseData release];
 	[method release];
@@ -242,7 +242,7 @@ NSString *MKFacebookRequestActivityEnded = @"MKFacebookRequestActivityEnded";
 	if(_urlRequestType == MKFacebookRequestTypePOST)
 	{
 		//NSLog([_facebookConnection description]);
-		NSMutableURLRequest *postRequest = [NSMutableURLRequest requestWithURL:_requestURL 
+		NSMutableURLRequest *postRequest = [NSMutableURLRequest requestWithURL:requestURL 
 																	 cachePolicy:NSURLRequestReloadIgnoringCacheData 
 																 timeoutInterval:[self connectionTimeoutInterval]];
 		
@@ -311,7 +311,7 @@ NSString *MKFacebookRequestActivityEnded = @"MKFacebookRequestActivityEnded";
 
 			}
 			else if( [[_parameters objectForKey:key] isKindOfClass:[NSData class]] ){
-				[postBody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; filename=\"data\"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+				[postBody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; filename=\"data.mov\"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
 				[postBody appendData:[[NSString stringWithString:@"Content-Type: content/unknown\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];	
 				[postBody appendData:(NSData *)[_parameters objectForKey:key]];
 				[postBody appendData:endLineData];

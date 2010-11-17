@@ -23,6 +23,7 @@
 @class MKLoginWindow;
 
 extern NSString *MKAPIServerURL;
+extern NSString *MKVideoAPIServerURL;
 extern NSString *MKLoginUrl;
 extern NSString *MKExtendPermissionsURL;
 extern NSString *MKFacebookAPIVersion;
