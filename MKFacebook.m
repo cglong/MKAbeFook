@@ -232,7 +232,7 @@ NSString *MKFacebookDefaultResponseFormat = @"XML";
 	[[loginWindow window] setTitle:@"Extended Permissions"];
 	loginWindow._loginWindowIsSheet = forSheet;
 	
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?api_key=%@&v=%@&ext_perm=%@&display=popup&fbconnect=true&http://www.facebook.com/connect/login_success.html?xxRESULTTOKENxx", MKExtendPermissionsURL, [[MKFacebookSession sharedMKFacebookSession] apiKey], MKFacebookAPIVersion, aString]];
+	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?api_key=%@&v=%@&ext_perm=%@&display=popup&fbconnect=true&next=http://www.facebook.com/connect/login_success.html?xxRESULTTOKENxx", MKExtendPermissionsURL, [[MKFacebookSession sharedMKFacebookSession] apiKey], MKFacebookAPIVersion, aString]];
 	
 
 	[loginWindow loadURL:url];
