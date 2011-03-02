@@ -55,13 +55,12 @@ extern NSString *MKFacebookDefaultResponseFormat;
 	id _delegate;
 	BOOL _alertMessagesEnabled;
 	BOOL _displayLoginAlerts;
-
-	@private BOOL useModalLogin;
+	@private 
+    BOOL useModalLogin;
 }
 
 #pragma mark Properties
 
-@property (readwrite) BOOL useModalLogin;
 
 #pragma mark -
 

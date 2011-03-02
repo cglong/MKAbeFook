@@ -30,6 +30,7 @@ NSString *MKFacebookSessionKey = @"MKFacebookSession";
 @synthesize session;
 @synthesize apiKey;
 @synthesize secretKey;
+@synthesize _useSecureURL;
 
 SYNTHESIZE_SINGLETON_FOR_CLASS(MKFacebookSession);
 
@@ -38,8 +39,14 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MKFacebookSession);
 	if(self != nil)
 	{
 		session = nil;
+        _useSecureURL = NO;
 	}
 	return self;
+}
+
+- (NSString *)protocol{
+    NSString *p = self.useSecureURL ? @"https://" : @"http://";
+    return p;
 }
 
 - (void)saveSession:(NSDictionary *)aSession{

@@ -30,12 +30,15 @@ extern NSString *MKFacebookSessionKey;
 	NSString *apiKey;
 	NSString *secretKey;
 	BOOL _validSession;
+    BOOL _useSecureURL;
 
 }
 
 @property (nonatomic, retain) NSDictionary *session;
 @property (nonatomic, retain) NSString *apiKey;
 @property (nonatomic, retain) NSString *secretKey;
+@property (readwrite, getter = useSecureURL, setter = setUseSecureURL:) BOOL _useSecureURL;
+@property (readonly) NSString *protocol;
 
 + (MKFacebookSession *)sharedMKFacebookSession;
 

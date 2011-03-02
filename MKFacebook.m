@@ -25,10 +25,10 @@
 #import "MKFacebookSession.h"
 #import "MKFacebookRequest.h"
 
-NSString *MKAPIServerURL = @"http://api.facebook.com/restserver.php";
-NSString *MKVideoAPIServerURL = @"http://api-video.facebook.com/restserver.php";
-NSString *MKLoginUrl = @"http://www.facebook.com/login.php";
-NSString *MKExtendPermissionsURL = @"http://www.facebook.com/connect/prompt_permissions.php";
+NSString *MKAPIServerURL = @"api.facebook.com/restserver.php";
+NSString *MKVideoAPIServerURL = @"api-video.facebook.com/restserver.php";
+NSString *MKLoginUrl = @"https://www.facebook.com/login.php";
+NSString *MKExtendPermissionsURL = @"https://www.facebook.com/connect/prompt_permissions.php";
 NSString *MKFacebookAPIVersion = @"1.0";
 NSString *MKFacebookDefaultResponseFormat = @"XML";
 
@@ -43,7 +43,6 @@ NSString *MKFacebookDefaultResponseFormat = @"XML";
 
 #pragma mark Properties
 
-@synthesize useModalLogin;
 
 #pragma mark -
 
@@ -73,7 +72,7 @@ NSString *MKFacebookDefaultResponseFormat = @"XML";
 
 		_delegate = aDelegate;
 		_displayLoginAlerts = YES;
-		self.useModalLogin = NO;
+		useModalLogin = NO;
 
 	}
 	return self;
@@ -95,7 +94,7 @@ NSString *MKFacebookDefaultResponseFormat = @"XML";
 }
 
 - (void)loginUsingModalWindow{
-	self.useModalLogin = YES;
+	useModalLogin = YES;
 	[self loginWithPermissions:nil forSheet:NO];
 }
 
@@ -124,7 +123,7 @@ NSString *MKFacebookDefaultResponseFormat = @"XML";
 		if(sheet == NO)
 		{
 			[[loginWindow window] center];
-			if (self.useModalLogin == YES) {
+			if (useModalLogin == YES) {
 				DLog(@"display modal login");
 				loginWindow.runModally = YES;
 				//borrowed from - http://www.dejal.com/blog/2007/01/cocoa-topics-case-modal-webview

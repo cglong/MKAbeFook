@@ -142,9 +142,14 @@
 	NSURL *url = [[[frame dataSource] mainResource] URL];
 	NSString *urlString = [url description];
 	DLog(@"current URL: %@", urlString);
-	
+    
+    //check to see if the user was returned to https or http. use the returned prefix for future calls.
+    MKFacebookSession *session = [MKFacebookSession sharedMKFacebookSession];
+    session.useSecureURL = [urlString hasPrefix:@"https://"] ? YES : NO;	
+    NSString *successString = [NSString stringWithFormat:@"%@www.facebook.com/connect/login_success.html", session.protocol];
+    NSString *failureString = [NSString stringWithFormat:@"%@www.facebook.com/connect/login_failure.html", session.protocol];
 	//we need to do some extra things when a user logs in successfully
-	if([urlString hasPrefix:@"http://www.facebook.com/connect/login_success.html"])
+	if([urlString hasPrefix:successString])
 	{
 		// facebook returns with this URL even if you do not allow PhotoPresenter access with extended permissions
 		// no sessionInfo is returnd in the latter case
@@ -190,7 +195,7 @@
 		}
 	}
 	
-	if([urlString hasPrefix:@"http://www.facebook.com/connect/login_failure.html"])
+	if([urlString hasPrefix:failureString])
 	{
 		//display a custom failed login message that doesn't require an external host
 		NSString *next = [[NSBundle mainBundle] pathForResource:@"FacebookLoginFailed" ofType:@"html"];

@@ -20,7 +20,9 @@
 - (id)initWithDelegate:(id)delegate selector:(SEL)selector{
 	self = [super initWithDelegate:delegate selector:selector];
 	[requestURL release];
-	requestURL = [[NSURL URLWithString:MKVideoAPIServerURL] retain];
+    MKFacebookSession *session = [MKFacebookSession sharedMKFacebookSession];
+    NSString *urlString = [NSString stringWithFormat:@"%@%@", session.protocol, MKVideoAPIServerURL];
+    requestURL = [[NSURL URLWithString:urlString] retain];
 	return self;
 }
 
