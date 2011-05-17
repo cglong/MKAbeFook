@@ -21,52 +21,48 @@
 #import <Cocoa/Cocoa.h>
 #import "SynthesizeSingleton.h"
 
-extern NSString *MKFacebookSessionKey;
+extern NSString *MKFacebookAccessTokenKey;
 
 //Handles saving session information to disk and loading existing sessions.
 @interface MKFacebookSession : NSObject {
 	
-	NSDictionary *session;
-	NSString *apiKey;
-	NSString *secretKey;
+    NSString *appID;
+    NSString *accessToken;
 	BOOL _validSession;
+    NSString *_uid;
 
 }
 
-@property (nonatomic, retain) NSDictionary *session;
-@property (nonatomic, retain) NSString *apiKey;
-@property (nonatomic, retain) NSString *secretKey;
+@property (nonatomic, retain) NSString *appID;
+@property (nonatomic, retain) NSString *accessToken;
+@property (readonly, getter = uid) NSString *_uid;
 
 + (MKFacebookSession *)sharedMKFacebookSession;
 
-// Accepts a new session dictionary.  Saves the session to the application defaults.
-- (void)saveSession:(NSDictionary *)aSession;
 
+// Accepts an access_token from oAuth login and saves it to the application defaults
+- (void)saveAccessToken:(NSString *)aToken;
 
 /*
 Logs in a user from a saved session.
  
-Attempts to load a stored infinte session for the application.  This method checks NSUserDefaults for a stored sessionKey and sessionSecret.  It uses a synchronous request to try to authenticate the stored session.  Used internally when login or loginWithPermissions:forSheet: are called.
+Attempts to load a stored infinte session for the application.  This method checks NSUserDefaults for a stored access token.  It uses a synchronous request to try to authenticate the stored token.  Used internally when login or loginWithPermissions:forSheet: are called.
  
 Returns true if stored session information is valid and a user id is successfully returned from Facebook otherwise it returns false.
 */
-- (BOOL)loadSession;
+- (BOOL)loadAccessToken;
 
 
 
-// Destroys any saved session.
-- (void)destroySession;
+// Destroys any saved token.
+- (void)destroyAccessToken;
 
 
-// Checks to see if session looks valid.
-- (BOOL)validSession;
+// Checks to see if session looks valid. Uses loadAccessToken to validate the stored access token.
+- (BOOL)validAccessToken;
 
 
-//accessors to session information
-- (NSString *)sessionKey;
-- (NSString *)sessionSecret;
-- (NSString *)expirationDate;
+//Uses a synchronous request to fetch the uid associated with the access token.
 - (NSString *)uid;
-- (NSString *)sig;
 
 @end

@@ -19,4 +19,9 @@
  Prepares string so it can be passed in a URL.
  */
 - (NSString *) encodeURLLegally;
+
+/*
+ Returns the string found between start and stop, nil if no string was found
+ */
+- (NSString *)substringBetweenString:(NSString *)start andString:(NSString *)stop;
 @end

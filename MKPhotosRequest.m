@@ -62,10 +62,19 @@
 	[parameters release];
 }
 
-- (void)photosGetAlbums:(NSArray *)aids{
+- (void)photosGetAlbums:(id)uidOrAids{
 	NSMutableDictionary *parameters = [[NSMutableDictionary alloc] init];
 	self.method = @"photos.getAlbums";
-	[parameters setValue:[aids componentsJoinedByString:@","] forKey:@"aids"];
+    
+    if([uidOrAids isKindOfClass:[NSString class]]){
+        [parameters setValue:uidOrAids forKey:@"uid"];
+    }else if ([uidOrAids isKindOfClass:[NSArray class]]) {
+        [parameters setValue:[uidOrAids componentsJoinedByString:@","] forKey:@"aids"];
+    }else{
+        NSAssert(NO, @"photosGetAlbums: must be passed a NSString or NSArray");
+        [parameters release];
+        return;
+    }
 	[self setParameters:parameters];
 	[self sendRequest];
 	[parameters release];

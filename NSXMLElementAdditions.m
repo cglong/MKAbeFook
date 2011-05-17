@@ -35,7 +35,7 @@
 	NSXMLElement *childElement;
 	NSString *key;
 	id value;
-	while (childElement = [e nextObject]) {
+	while ((childElement = [e nextObject])) {
 		key = [childElement name];
 		value = nil;
 

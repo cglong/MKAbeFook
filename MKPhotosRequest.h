@@ -95,13 +95,13 @@
 /*!
  @brief Wrapper for photos.getAlbums
  
- @param aids Return albums with aids in this list. Array of aid strings.
+ @param uidOrAids Pass in a string (uid) or NSArray (aids) Return albums with for the UID or aids.
  
  See Facebook photos.getAlbums documentation http://wiki.developers.facebook.com/index.php/Photos.getAlbums
  
  @version 0.9 and later
  */
-- (void)photosGetAlbums:(NSArray *)aids;
+- (void)photosGetAlbums:(id)uidOrAids;
 //@}
 
 

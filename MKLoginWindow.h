@@ -17,8 +17,10 @@
  */
 
 #import <Cocoa/Cocoa.h>
-//0.6 case sensitivity issue fixed.  Thanks Dale.
 #import <WebKit/WebKit.h>
+
+extern NSString *MKLoginRedirectURI;
+
 @interface MKLoginWindow : NSWindowController  {
 	NSString *path;
 	IBOutlet WebView *loginWebView;

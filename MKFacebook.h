@@ -23,10 +23,8 @@
 @class MKLoginWindow;
 
 extern NSString *MKAPIServerURL;
-extern NSString *MKVideoAPIServerURL;
 extern NSString *MKLoginUrl;
 extern NSString *MKExtendPermissionsURL;
-extern NSString *MKFacebookAPIVersion;
 extern NSString *MKFacebookDefaultResponseFormat;
 /*!
  
@@ -76,30 +74,30 @@ extern NSString *MKFacebookDefaultResponseFormat;
 /*!
  @brief Setup new MKFacebook object.
  
- @param anAPIKey Your API key issued by Facebook.
+ @param anAppID Your App id as assigned by Facebook.
  @param aDelegate A delegate object that will receive calls from the MKFacebook object.
   
  The delegate object must implement a userLoginSuccessful method that will called after a user has successfully logged in.
  
  @result Returns allocated and initiated MKFacebook object ready to be used to log into the Facebook API.
-@version 0.7 and later
+@version 0.9 and later
  */
-+ (MKFacebook *)facebookWithAPIKey:(NSString *)anAPIKey delegate:(id)aDelegate;
++ (MKFacebook *)facebookWithAppID:(NSString *)anAppID delegate:(id)aDelegate;
 
 
 
 /*!
  @brief Setup new MKFacebook object.
  
- @param anAPIKey Your API key issued by Facebook.
+ @param anAppID Your App id as assigned by Facebook.
  @param aDelegate A delegate object that will receive calls from the MKFacebook object.
   
  The delegate object must implement a userLoginSuccessful method that will called after a user has successfully logged in.
  
  @result Returns initiated MKFacebook object ready to be used to log into the Facebook API.
-  @version 0.7 and later
+  @version 0.9 and later
  */
-- (MKFacebook *)initUsingAPIKey:(NSString *)anAPIKey delegate:(id)aDelegate;
+- (MKFacebook *)initUsingAppID:(NSString *)anAppID delegate:(id)aDelegate;
 
 
 //@}	//ENDS Instantiate group
@@ -164,7 +162,7 @@ extern NSString *MKFacebookDefaultResponseFormat;
 
  @version 0.9 and later
  */
-- (NSWindow *)loginWithPermissions:(NSArray *)permissions forSheet:(BOOL)sheet;
+- (NSWindowController *)loginWithPermissions:(NSArray *)permissions forSheet:(BOOL)sheet;
 
 
 
@@ -207,48 +205,6 @@ extern NSString *MKFacebookDefaultResponseFormat;
 //@}	//ENDS Manage User Login group
 #pragma mark -
 
-
-
-#pragma mark Extend Permisisons
-/*! @name Extend Permissions
- *	Display a window to allow user to extent application permissions.
- */
-//@{
-
-
-/*!
- @brief Display a window and a Facebook page to extend permisisons.
- 
- @param aString Name of extended permission to grant. See Facebook documentation for allowed extended permissions.
-
- This method will display a new window and load the Facebook URL http://www.facebook.com/connect/prompt_permissions.php to extend permissions of the application.
- 
- @see grantExtendedPermission:forSheet:
- 
- @version 0.7.4 and later
-*/
-- (void)grantExtendedPermission:(NSString *)aString;
-
-
-
-/*!
- @brief Display a window and a Facebook page to extend permisisons.
- 
- @param aString Name of extended permission to grant. See Facebook documentation for allowed extended permissions.
- @param forSheet BOOL to request a NSWindow that can be attached as a sheet, pass in NO to simply display the window.
-
- This method will display a new window and load the Facebook URL http://www.facebook.com/connect/prompt_permissions.php to extend permissions of the application.
- 
- @see grantExtendedPermission:
-
- @result Returns NSWindow or displays window.
- @version 0.8.2 and later
- */
-- (NSWindow *)grantExtendedPermission:(NSString *)aString forSheet:(BOOL)forSheet;
-
-
-//@}	//ENDS Extend Permissions group
-#pragma mark -
 
 
 #pragma mark Handle Login Alerts

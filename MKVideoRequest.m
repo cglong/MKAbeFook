@@ -19,8 +19,6 @@
 
 - (id)initWithDelegate:(id)delegate selector:(SEL)selector{
 	self = [super initWithDelegate:delegate selector:selector];
-	[requestURL release];
-	requestURL = [[NSURL URLWithString:MKVideoAPIServerURL] retain];
 	return self;
 }
 

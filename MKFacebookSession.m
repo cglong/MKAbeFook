@@ -23,13 +23,13 @@
 #import "NSXMLDocumentAdditions.h"
 #import "NSXMLElementAdditions.h"
 
-NSString *MKFacebookSessionKey = @"MKFacebookSession";
+NSString *MKFacebookAccessTokenKey = @"MKFacebookAccessToken";
 
 @implementation MKFacebookSession
 
-@synthesize session;
-@synthesize apiKey;
-@synthesize secretKey;
+@synthesize appID;
+@synthesize accessToken;
+@synthesize _uid;
 
 SYNTHESIZE_SINGLETON_FOR_CLASS(MKFacebookSession);
 
@@ -37,123 +37,87 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MKFacebookSession);
 	self = [super init];
 	if(self != nil)
 	{
-		session = nil;
+        _uid = nil;
 	}
 	return self;
 }
 
-- (void)saveSession:(NSDictionary *)aSession{
-	//TODO: check for a valid session before saving
-	
-	if(aSession != nil)
-	{
-		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-		[defaults setObject:aSession forKey:MKFacebookSessionKey];
-		self.session = aSession;
-		_validSession = YES;
-	}
+//TODO: implement saving an expiration date
+- (void)saveAccessToken:(NSString *)aToken{
+    //We're assuming the token is valid when it's passed in. How else can it be verified?
+    if (aToken != nil) {
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:aToken forKey:MKFacebookAccessTokenKey];
+        self.accessToken = aToken;
+        _validSession = YES;
+    }else{
+        self.accessToken = nil;
+        _validSession = NO;
+    }
 }
 
-
-- (BOOL)loadSession
+- (BOOL)loadAccessToken
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSDictionary *savedSession = [defaults objectForKey:MKFacebookSessionKey];
-	//TODO: use asynchronous request instead of synchronous
-	if(savedSession != nil)
-	{
-
-		self.session = savedSession;
-		DLog(@"loaded session: %@", [self.session description]);		
-		MKFacebookRequest *request = [[MKFacebookRequest alloc] init];
-		
-		NSXMLDocument *user = [request fetchFacebookData:[request generateFacebookURL:[NSDictionary dictionaryWithObjectsAndKeys:@"facebook.users.getLoggedInUser", @"method", nil]]];
-		[request release];
-		
-		if([user validFacebookResponse] == NO)
-		{
-			DLog(@"persistent login failed, here's why...");
+    
+    NSString *defaultsAccessToken = [defaults objectForKey:MKFacebookAccessTokenKey];
+    if (defaultsAccessToken != nil) {
+        self.accessToken = defaultsAccessToken;
+        MKFacebookRequest *request = [[[MKFacebookRequest alloc] init] autorelease];
+        NSXMLDocument *user = [request fetchFacebookData:[request generateFacebookURLForMethod:@"users.getLoggedInUser" parameters:nil]];
+        if ([user validFacebookResponse] == YES) {
+            if (_uid) {
+                [_uid release];
+                _uid = nil;
+            }
+            _uid = [[user rootElement] stringValue];
+            return YES;
+        }else{
+            DLog(@"persistent login failed, here's why...");
 			DLog(@"%@", [user description]);
 			return NO;
-		}
-		
-		//check to see if the uid returned is the same as our existing session
-		if ([[[user rootElement] stringValue] isEqualToString:[self uid]] && [self uid] != nil ) {
-			_validSession = YES;
-			return YES;
-		}else {
-			self.session = nil;
-			_validSession = NO;
-			DLog(@"facebook response does not match stored UID. Here are the raw values of the response: %@", [user description]);
-			DLog(@"compared %@ to %@", [[user rootElement] stringValue], [self uid]);
-			return NO;
-		}
-	}else {
-		DLog(@"No saved session was found in the defaults");
-	}
-
-	return NO;
+        }
+    }
+    
+    return NO;
 }
 
 
 //TODO: verify session by sending a request to Facebook using session information
-- (BOOL)validSession{
-	if([[NSUserDefaults standardUserDefaults] objectForKey:MKFacebookSessionKey] != nil)
-	{
-		return _validSession;
-	}
-		
-	return NO;
+- (BOOL)validAccessToken{
+	return [self loadAccessToken];
 }
 
-- (void)destroySession{
+- (void)destroyAccessToken{
 	DLog(@"session was destroyed");
-	[[NSUserDefaults standardUserDefaults] removeObjectForKey:MKFacebookSessionKey];
-	self.session = nil;
+	[[NSUserDefaults standardUserDefaults] removeObjectForKey:MKFacebookAccessTokenKey];
+	self.accessToken = nil;
+    if (_uid != nil) {
+        [_uid release];
+    }
+    _uid = nil;
 	_validSession = NO;
 }
 
-- (NSString *)sessionKey{
-	return [self.session valueForKey:@"session_key"];
-}
-
-- (NSString *)sessionSecret{
-	return [self.session valueForKey:@"secret"];
-}
-
-- (NSString *)expirationDate{
-	return [self.session valueForKey:@"expires"];
-}
 
 - (NSString *)uid
 {
-	id uid = [self.session objectForKey:@"uid"];
-	
-	if ([uid isKindOfClass:[NSDecimalNumber class]])
-	{
-		double doubleValue = [uid doubleValue];
-		long long longValue = llround(doubleValue);
-		uid = [NSString stringWithFormat:@"%lld", longValue];
-	}
-	else if ([uid isKindOfClass:[NSNumber class]])
-	{
-		double doubleValue = [uid doubleValue];
-		long long longValue = llround(doubleValue);
-		uid = [NSString stringWithFormat:@"%lld", longValue];
-	}
-	
-	return uid;
-}
-
-- (NSString *)sig{
-	return [self.session valueForKey:@"sig"];
+    //see if one has already been set
+    if (_uid != nil) {
+        return _uid;
+    }
+    //try to fetch and set the uid
+    if ([self loadAccessToken]) {
+        return _uid;
+    }
+    //unable to fetch the uid using the stored access token
+    return nil;
 }
 
 
 - (void)dealoc{
-	[session release];
-	[apiKey release];
-	[secretKey release];
+    [appID release];
+    [accessToken release];
 	[super dealloc];
 }
 
