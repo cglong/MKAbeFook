@@ -386,7 +386,7 @@ NSString *MKFacebookRequestActivityEnded = @"MKFacebookRequestActivityEnded";
     
     //support arrays or strings
     for(NSString *key in [_parameters allKeys]){
-        id object = nil;
+        id object = [_parameters objectForKey:key];
         if ([object isKindOfClass:[NSArray class]]) {
             [urlString appendFormat:@"&%@=%@", key, [object componentsJoinedByString:@","]];
         }
