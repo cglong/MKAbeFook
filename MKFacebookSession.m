@@ -70,7 +70,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MKFacebookSession);
                 [_uid release];
                 _uid = nil;
             }
-            _uid = [[user rootElement] stringValue];
+            _uid = [[[user rootElement] stringValue] retain];
             return YES;
         }else{
             DLog(@"persistent login failed, here's why...");
@@ -118,6 +118,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MKFacebookSession);
 - (void)dealoc{
     [appID release];
     [accessToken release];
+    [_uid release];
 	[super dealloc];
 }
 
