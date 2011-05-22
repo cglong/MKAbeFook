@@ -32,7 +32,6 @@ NSString *MKFacebookDefaultResponseFormat = @"XML";
 
 
 @interface MKFacebook (Private)
-- (void)setApiKey:(NSString *)anApiKey;
 - (NSURL *)prepareLoginURLWithExtendedPermissions:(NSArray *)extendedPermissions;
 @end
 
@@ -180,10 +179,8 @@ NSString *MKFacebookDefaultResponseFormat = @"XML";
 
 - (void)userLoginSuccessful
 {
-	
 	if([_delegate respondsToSelector:@selector(userLoginSuccessful)])
-		[_delegate performSelector:@selector(userLoginSuccessful)];
-	
+		[_delegate performSelector:@selector(userLoginSuccessful)];	
 }
 
 
@@ -200,27 +197,22 @@ NSString *MKFacebookDefaultResponseFormat = @"XML";
 
 
 
-//private
+#pragma mark Private
 - (NSURL *)prepareLoginURLWithExtendedPermissions:(NSArray *)extendedPermissions
 {
 	NSMutableString *loginString = [[[NSMutableString alloc] initWithString:MKLoginUrl] autorelease];
 	[loginString appendString:@"?client_id="];
 	[loginString appendString:[[MKFacebookSession sharedMKFacebookSession] appID]];
 	[loginString appendString:@"&display=popup"];
-	
 	[loginString appendFormat:@"&redirect_uri=%@", MKLoginRedirectURI];
     [loginString appendString:@"&response_type=token"];
 	
-
 	if(extendedPermissions != nil)
 	{
 		[loginString appendFormat:@"&scope=%@",[extendedPermissions componentsJoinedByString:@","]];
 	}
 
-	//[loginString appendString:@"&skipcookie"];
-
-	return [NSURL URLWithString:loginString];
-	
+	return [NSURL URLWithString:loginString];	
 }
 
 

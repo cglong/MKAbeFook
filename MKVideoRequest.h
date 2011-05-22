@@ -9,12 +9,14 @@
 #import <Cocoa/Cocoa.h>
 #import "MKFacebookRequest.h"
 
+extern NSString *MKVideoAPIServerURL;
+
 /*!
  
  @class MKVideoRequest
  
- Provides wrappers for some video methods. Untested as of 3.19.2010.
- 
+ Provides wrappers for some video methods.
+  
  @version 0.9 and later
  */
 @interface MKVideoRequest : MKFacebookRequest {

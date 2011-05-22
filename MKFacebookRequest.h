@@ -50,42 +50,42 @@ typedef int MKFacebookRequestResponseFormat;
 
 /*!
  @class MKFacebookRequest
- MKFacebookRequest handles all requests to the Facebook API.  It can send requests as either POST or GET and return the results to a specified delegate and selector.  
-
- To send a request you must provide an instance of MKFacebookRequest with a NSDictionary containing the parameters for your request.  Included in the dictionary must be a key "method" with a value of the full Facebook method being requested, i.e. "facebook.users.getInfo".  Values that are required by all Facebook methods, "v", "api_key", "format", "session_key", "sig", and "call_id", do not need to be in the NSDictionary of parameters you pass in, they will be added automatically.
-  
+ MKFacebookRequest handles all requests to the Facebook API.  Requests are sent asynchronously and responses (XML or JSON) via the MKFacebookRequest delegate methods.
  
- The MKFacebookRequest class is be capable of handling most of the methods available by the Facebook API, including facebook.photos.upload.  To upload a photo using this class include a NSImage object in your NSDictionary of parameters you provide and set the method key value to "facebook.photos.upload".  The name of the key for the NSImage object can be any string.
-
+ To send a request you must set the method property and supply any parameters via the parameters property. The parameters dictionary you provide should not inlcude the access_token key, as this is automatically added to each request.
+ 
+ 
+ Note: To to maintain backwards compatibility with older versions of MKAbeFook, you may use the key "method" in your parameters dictionary instead of setting the method property.
+  
+ MKFacebookRequest should support most of the legacy REST API methods, for a list of supported methods and their parameters visit https://developers.facebook.com/docs/reference/rest/
+ 
  This class will post notifications named "MKFacebookRequestActivityStarted" and "MKFacebookRequestActivityEnded" when network activity starts and ends.  You are responsible for adding observers for handling the notifications.
  
- See the MKFacebookRequestQueue class for sending a series of requests that are sent sequentially.
- 
-  
- See MKFacebookRequestDelegate for information about receiving the responses from Facebook.
- 
+  @see MKFacebookRequestDelegate
+  @see MKFacebookRequestQueue
   @version 0.7 and later
  */
 @interface MKFacebookRequest : NSObject {
 	NSURLConnection *theConnection; //internal connection used if object is used multiple times.
-	NSTimeInterval connectionTimeoutInterval;
-	id _delegate;
-	SEL _selector;
-	NSMutableData *_responseData;
 	BOOL _requestIsDone; //dirty stupid way of trying to prevent crashing when trying to cancel the request when it's not active.  isn't there a better way to do this?
-	MKFacebookRequestType _urlRequestType;
-	MKFacebookRequestResponseFormat responseFormat;
-	NSMutableDictionary *_parameters;
 	NSURL *requestURL;
-	BOOL _displayAPIErrorAlert;
-	int _numberOfRequestAttempts;
 	int _requestAttemptCount;
 	MKFacebookSession *_session;
 
 	//exposed via properties
+	id delegate;
+	SEL selector;
 	NSString *method;
+	NSMutableDictionary *parameters;
 	NSString *rawResponse;
-	
+	MKFacebookRequestType urlRequestType;
+	MKFacebookRequestResponseFormat responseFormat;
+    int numberOfRequestAttempts;
+	BOOL displayAPIErrorAlerts;
+    NSTimeInterval connectionTimeoutInterval;
+	NSMutableData *_responseData;
+
+    
 	//default selectors
 	SEL defaultResponseSelector;
 	SEL defaultErrorSelector;
@@ -101,13 +101,59 @@ typedef int MKFacebookRequestResponseFormat;
 /*! @name Properties */
 //@{
 /*!
+ @brief Delegate to be passed response from request.
+ */
+@property (nonatomic, assign) id delegate;
+
+/*!
+ @brief Custom selector to accept response from Facebook.
+ 
+ You can specify a custom selector to be called when the request receives a successful response from Facebook. Your selector should accept a single (id) parameter. 
+ 
+ Note: If an error is encountered the MKFacebookRequestDelegate methods will be called.
+ */
+@property (nonatomic, assign) SEL selector;
+
+/*!
  @brief Facebook method to call.
  
- This property may be set instead of including a 'method' key in the NSDictionary passed in as parameters. You can retrieve the method used in a request through this property even if you use a dictionary containing a 'method' key.
+ See https://developers.facebook.com/docs/reference/rest/ for a list of methods that can be called.
  
  @version 0.9 and later
  */
 @property (retain, nonatomic) NSString *method;
+
+
+/*!
+ @brief The parameters for the request.
+ 
+ See https://developers.facebook.com/docs/reference/rest/ documentation on parameters for Facebook methods.
+ 
+ @see setParameters:
+ */
+@property (retain, nonatomic) NSDictionary *parameters;
+
+
+/*!
+ @brief Unparsed response from Facebook.
+ 
+ Contains unparsed XML or JSON result from Facebook. Use responseFormat property to specify which type of response you want returned from Facebook. Only available when using asynchronous requests.
+ 
+ @see responseFormat
+ 
+ @version 0.9 and later
+ 
+ */
+@property (readonly) NSString *rawResponse;
+
+
+/*!
+ @brief The type of request to perform. (Get or Post)
+ 
+ Default is MKFacebookRequestTypePOST
+ */
+@property (nonatomic, assign) MKFacebookRequestType urlRequestType;
+
 
 /*!
  @brief Set the response format type, XML or JSON.  XML is default.
@@ -118,22 +164,27 @@ typedef int MKFacebookRequestResponseFormat;
  
  @version 0.9 and later
 
+ @see responseFormat
  @see rawResponse
- 
  */
 @property (nonatomic, assign) MKFacebookRequestResponseFormat responseFormat;
 
-/*!
- @brief Unparsed response from Facebook.
- 
- Contains unparsed XML or JSON result from Facebook. Use responseFormat property to specify which type of response you want returned from Facebook. Only available when using asynchronous requests.
- 
- @see responseFormat
- 
- @version 0.9 and later
 
+/*!
+ @brief Set the number of times to attempt a request before giving up.
+ 
+ Sets how many times the request should be attempted before giving up.  Note: the delegate will not receive notification of a failed attempt unless all attempts fail.  Default is 5.
  */
-@property (readonly) NSString *rawResponse;
+@property (readwrite) int numberOfRequestAttempts;
+
+
+/*!
+ @brief Display API Error alert windows.
+ 
+ Sets whether or not instance should automatically display error windows when network connection or xml parsing errors are encountered.  Default is yes.
+ */
+@property (readwrite) BOOL displayAPIErrorAlerts;
+
 
 /*!
  @brief How long to wait before aborting the request.
@@ -194,20 +245,6 @@ typedef int MKFacebookRequestResponseFormat;
 - (id)initWithDelegate:(id)aDelegate selector:(SEL)aSelector;
 
 
-
-
-/*!
- @brief Setup new MKFacebookRequest object.
- 
- @param parameters NSDictionary containing parameters for requested method.  The dictionary must contain a the key "method" with a value of the full Facebook method being requested, i.e. "facebook.users.getInfo". Values that are required by all Facebook methods, "v", "api_key", "format", "session_key", "sig", and "call_id" do not need to be included in this dictionary.
- @param aDelegate The object that will receive the information returned by Facebook.
- @param aSelector Method in delegate object to be called and passed the valid response from Facebook.  This method should accept an (id) as an argument. Responses that contain an error will not be sent to this selector. Use the appropriate delegate methods for handling error responses.
-  
- @see MKFacebookRequestDelegate
- 
-  @version 0.9 and later
- */
-- (id)initWithParameters:(NSDictionary *)parameters delegate:(id)aDelegate selector:(SEL)aSelector;
 //@}
 
 #pragma mark -
@@ -223,16 +260,14 @@ typedef int MKFacebookRequestResponseFormat;
 /*!
  @brief Pass in a NSDictionary of parameters for your request.
  
- @param parameters NSDictionary containing parameters for requested method.  
+ @param params NSDictionary containing parameters for requested method.  
  
- The parameters dictionary must contain a the key "method" with a value of the full Facebook method being requested, i.e. "facebook.users.getInfo".  Values that are required by all Facebook methods, "v", "api_key", "format", "session_key", "sig", and "call_id" do not need to be included in this dictionary.
- 
+ See https://developers.facebook.com/docs/reference/rest/ for documentation regarding parameters for the request you are making.
  
  @verbatim
  NSMutableDictionary *parameters = [[NSMutableDictionary alloc] init];
  
  //set up parameters for request
- [parameters setValue:@"users.getInfo" forKey:@"method"];
  [parameters setValue:[fbConnection uid] forKey:@"uid"];
  
  //lists can be either comma separated strings or arrays containing strings, the next two lines are both valid
@@ -241,10 +276,7 @@ typedef int MKFacebookRequestResponseFormat;
  
  //add parameters to request
  [request setParameters:parameters];
- 
- //send the request
- [request sendRequest];
- 
+  
  [parameters release];
  @endverbatim
  
@@ -252,47 +284,11 @@ typedef int MKFacebookRequestResponseFormat;
  
  @version 0.7 and later
  */
-- (void)setParameters:(NSDictionary *)parameters;
+- (void)setParameters:(NSDictionary *)params;
 
 
 /*!
- @brief Set the number of times to attempt a request before giving up.
- 
- Sets how many times the request should be attempted before giving up.  Note: the delegate will not receive notification of a failed attempt unless all attempts fail.  Default is 5.
- @version 0.8 and later
- */
-- (void)setNumberOfRequestAttempts:(int)requestAttempts;
-
-
-
-/*!
- @brief Set the type of request (POST or GET).  POST is default.
- 
- @param urlRequestType Accepts MKFacebookRequestTypePOST or MKFacebookRequestTypeGET to specify request type.  If no request type is set MKFacebookRequestTypePOST will be used.
- @version 0.7 and later
- */
-- (void)setURLRequestType:(MKFacebookRequestType)urlRequestType;
-
-//returns type of request that will be made
-- (MKFacebookRequestType)urlRequestType;
-
-
-/*!
- @brief Set the response format type, XML or JSON.  XML is default.
- 
- @param requestFormat Accepts MKFacebookRequestResponseFormatXML or MKFacebookRequestResponseFormatJSON to specify response type.
- 
- @deprecated Version 0.9
- 
- @see responseFormat
- @see rawResponse
- */
--(void)setRequestFormat:(MKFacebookRequestResponseFormat)requestFormat;
-
-
-
-/*!
- @brief Generates the appropriate URL and signature based on parameters for request.  Sends request to Facebook.
+ @brief Generates the appropriate URL and based on method and parameters for request.  Sends request to Facebook.
  
  MKFacebookRequest will automatically attempt the request again if any of the following errors are encountered:
  - max number of requests allowed reached
@@ -335,25 +331,19 @@ typedef int MKFacebookRequestResponseFormat;
 
 /*!
   @brief Sets the parameters before sending the request.
-
- Sets parameters before sending the request.
  
- See sendRequest for details about what happens when a request is sent to Facebook.
+ @deprecated Use sendRequest:withParameters: instead.
  
- @see sendRequest
-  
- @version 0.9 and later
- 
- @deprecated
+ @see sendRequest:withParameters:
  */
-- (void)sendRequestWithParameters:(NSDictionary *)parameters;
+- (void)sendRequestWithParameters:(NSDictionary *)params;
 
 /*!
   @brief Sets method and parameters before sending the request.
  
  @param aMethod Facebook method to call.
  
- @param parameters NSDictionary of parameters to pass to method. Does not need to contain a 'method' key.
+ @param params NSDictionary of parameters to pass to method. Does not need to contain a 'method' key.
  
  Sets the method and parameters before sending the request.
  
@@ -363,9 +353,7 @@ typedef int MKFacebookRequestResponseFormat;
 
  @version 0.9 and later
 */
-- (void)sendRequest:(NSString *)aMethod withParameters:(NSDictionary *)parameters;
-
-
+- (void)sendRequest:(NSString *)aMethod withParameters:(NSDictionary *)params;
 
 //@}
 
@@ -380,7 +368,7 @@ typedef int MKFacebookRequestResponseFormat;
  @brief Generates a full URL including a signature for the method name and parameters passed in.  
  
  @param aMethodName Full Facebook method name to be called.  Example: users.getInfo
- @param parameters NSDictionary containing parameters and values for the method being called.  They keys are the parameter names and the values are the arguments.
+ @param params NSDictionary containing parameters and values for the method being called.  They keys are the parameter names and the values are the arguments.
  
  This method will automatically include all parameters required by every Facebook method.  Parameters you do not need to include are "v", "api_key", "format", "session_key", and "call_id".  See official Facebook documentation for all other parameters available depending on the method you are calling.  As of 0.7 this method is considered deprecated, use generateFacebookURL: instead.
  
@@ -390,7 +378,7 @@ typedef int MKFacebookRequestResponseFormat;
  @see fetchFacebookData:
  
  */
-- (NSURL *)generateFacebookURLForMethod:(NSString *)aMethodName parameters:(NSDictionary *)parameters;
+- (NSURL *)generateFacebookURLForMethod:(NSString *)aMethodName parameters:(NSDictionary *)params;
 
 
 /*!
@@ -423,67 +411,6 @@ typedef int MKFacebookRequestResponseFormat;
  */
 - (void)cancelRequest;
 //@}
-
-
-
-/*!
- @brief Set the delegate to recieve request results.
- 
- @param delegate The object that will receive the inforamtion returned by Facebook.
- 
- @see MKFacebookRequestDelegate
- 
- @version 0.7 and later
- */
-- (void)setDelegate:(id)delegate;
-
-
-- (id)delegate;
-
-
-/*!
- @brief Set the selector to receive the request results.
- 
- @param selector Method in delegate object to be called and passed the valid response from Facebook.  This method should accept an (id) as an argument. Responses containing errors will not be sent to this selector. Use the appropriate delegate methods for handling errors
- 
- @see MKFacebookRequestDelegate
- 
- @version 0.7 and later
- */
-- (void)setSelector:(SEL)selector;
-
-
-
-
-/*!
- @brief Set to optionally automatically display error window when an error is encountered during a request.
- 
- @param aBool Automatically display errorr windows or not.
- 
- Sets whether or not instance should automatically display error windows when network connection or xml parsing errors are encountered.  Default is yes.
- 
- @see displayAPIErrorAlert
- 
- @version 0.8 and later
- */
-- (void)setDisplayAPIErrorAlert:(BOOL)aBool;
-
-
-
-/*!
- @brief Returns TRUE if error windows will be displayed.
- 
- @result Returns boolean indicating whether or not instance will automatically display error windows or not.
- 
- @see setDisplayAPIErrorAlert:
- 
- @version 0.8 and later
- */
-- (BOOL)displayAPIErrorAlert;
-
-
-
-
 
 
 #pragma mark -

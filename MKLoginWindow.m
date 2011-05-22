@@ -19,13 +19,20 @@
 #import "MKLoginWindow.h"
 #import "MKFacebookRequest.h"
 #import "NSXMLElementAdditions.h"
-
-#import "SBJSON.h"
-#import "NSString+SBJSON.h"
 #import "MKFacebookSession.h"
 #import "NSStringExtras.h"
 
 NSString *MKLoginRedirectURI = @"https://www.facebook.com/connect/login_success.html";
+
+@interface MKLoginWindow (Private)
+
+-(void)displayLoadingWindowIndicator;
+-(void)hideLoadingWindowIndicator;
+-(void)setWindowSize:(NSSize)windowSize;
+-(void)windowWillClose:(NSNotification *)aNotification;
+
+@end
+
 
 @implementation MKLoginWindow
 @synthesize _loginWindowIsSheet;
@@ -44,31 +51,14 @@ NSString *MKLoginRedirectURI = @"https://www.facebook.com/connect/login_success.
 }
 
 
-
 -(void)awakeFromNib
-{
-	//TODO: the window won't load correctly when we try to grant permissions unless we do this... i don't understand why...
-	//NSRect frame = [[self window] frame];
-	//[[self window] setFrame:frame display:YES animate:YES];
-	
+{	
 	[loginWebView setPolicyDelegate:self];
 	[loadingWebViewProgressIndicator bind:@"value" toObject:loginWebView withKeyPath:@"estimatedProgress" options:nil];
 	[self displayLoadingWindowIndicator];
 }
 
 
-
--(void)displayLoadingWindowIndicator
-{
-	[loadingWindowProgressIndicator setHidden:NO];
-	[loadingWindowProgressIndicator startAnimation:nil];
-}
-
--(void)hideLoadingWindowIndicator
-{
-	[loadingWindowProgressIndicator stopAnimation:nil];
-	[loadingWindowProgressIndicator setHidden:YES];
-}
 
 -(void)loadURL:(NSURL *)loginURL
 {
@@ -77,10 +67,7 @@ NSString *MKLoginRedirectURI = @"https://www.facebook.com/connect/login_success.
 	
 	DLog(@"loading url: %@", [loginURL description]);
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:loginURL];
-	
-	//[[[loginWebView mainFrame] frameView] setAllowsScrolling:NO];	
 	[[loginWebView mainFrame] loadRequest:request];
-	//[self hideLoadingWindowIndicator];
 }
 
 
@@ -97,30 +84,6 @@ NSString *MKLoginRedirectURI = @"https://www.facebook.com/connect/login_success.
 	}
 }
 
--(void)setWindowSize:(NSSize)windowSize
-{
-
-	NSRect screenRect = [[NSScreen mainScreen] frame];
-	NSRect rect = NSMakeRect(screenRect.size.width * .15, screenRect.size.height * .15, windowSize.width, windowSize.height);
-	[[self window] setFrame:rect display:YES animate:YES];
-}
-
-
-- (void)windowWillClose:(NSNotification *)aNotification
-{
-	DLog(@"windowWillClose: was called");
-
-	if (self.runModally == YES) {
-		[NSApp stopModal];
-	}else if (self._loginWindowIsSheet == YES)
-	{
-		[[self window] orderOut:[aNotification object]];
-		[NSApp endSheet:[self window] returnCode:1];
-	}
-
-	//this is not the proper way to do this, someone please fix it.
-	[self autorelease];
-}
 
 -(void)dealloc
 {
@@ -193,27 +156,7 @@ NSString *MKLoginRedirectURI = @"https://www.facebook.com/connect/login_success.
             }
         }
         
-        
-//		else
-//		{
-//			DLog(@"failed to save session info returned by facebook....");
-//            [self closeWindow:self];
-//		}
-	}
-	
-//	if([urlString hasPrefix:@"https://www.facebook.com/connect/login_failure.html"])
-//	{
-//		//display a custom failed login message that doesn't require an external host
-//		NSString *next = [[NSBundle mainBundle] pathForResource:@"FacebookLoginFailed" ofType:@"html"];
-//		if (! next)
-//		{
-//			NSString *fwp = [[NSBundle mainBundle] privateFrameworksPath];
-//			next = [NSString stringWithFormat:@"%@/MKAbeFook.framework/Resources/login_failed.html", fwp];
-//		}
-//		[self loadURL:[NSURL fileURLWithPath:[next stringByExpandingTildeInPath]]];
-//		
-//	}
-	
+    }
 	
 }
 
@@ -228,6 +171,43 @@ NSString *MKLoginRedirectURI = @"https://www.facebook.com/connect/login_success.
 		[listener use];
 }
 
+#pragma -
 
 
+#pragma mark Private
+
+-(void)displayLoadingWindowIndicator
+{
+	[loadingWindowProgressIndicator setHidden:NO];
+	[loadingWindowProgressIndicator startAnimation:nil];
+}
+
+-(void)hideLoadingWindowIndicator
+{
+	[loadingWindowProgressIndicator stopAnimation:nil];
+	[loadingWindowProgressIndicator setHidden:YES];
+}
+
+-(void)setWindowSize:(NSSize)windowSize
+{
+	NSRect screenRect = [[NSScreen mainScreen] frame];
+	NSRect rect = NSMakeRect(screenRect.size.width * .15, screenRect.size.height * .15, windowSize.width, windowSize.height);
+	[[self window] setFrame:rect display:YES animate:YES];
+}
+
+- (void)windowWillClose:(NSNotification *)aNotification
+{
+	DLog(@"windowWillClose: was called");
+    
+	if (self.runModally == YES) {
+		[NSApp stopModal];
+	}else if (self._loginWindowIsSheet == YES)
+	{
+		[[self window] orderOut:[aNotification object]];
+		[NSApp endSheet:[self window] returnCode:1];
+	}
+    
+	//this is not the proper way to do this, someone please fix it.
+	[self autorelease];
+}
 @end

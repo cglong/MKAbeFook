@@ -33,7 +33,7 @@ extern NSString *MKFacebookDefaultResponseFormat;
 
  To provide a user with a login window for your application you must do the following:
  
- 1. initialize a new MKFacebook object with your API key and a delegate object
+ 1. initialize a new MKFacebook object with your App ID and a delegate object
  
  2. call login or loginWithPermissions:forSheet:
  
@@ -112,12 +112,13 @@ extern NSString *MKFacebookDefaultResponseFormat;
 //@{
 
 /*!
- @brief Load existing session if available or display a login window.
+ @brief Load existing access token if available or display a login window.
  
- Tries to load existing session. If no session is available a login window will be displayed. If a user logs in successfully the session will automatically be saved to the application NSUserDefaults. If you need to display a login window while a modal window active use loginUsingModalWindow.
- 
+ Checks to see if there is an access_token available in MKFacebookSession. The access token is verified by sending a synchronous request calling users.getLoggedInUser. If no token is available or the token is not verified a login window will be displayed.
  
  You can customize the message displayed in the login window after a successful or failed login attempt by creating "FacebookLoginSuccess.html" and "FacebookLoginFailed.html" files and placing them in the Resources folder of your application.
+ 
+ Authentication uses the oAuth process described at https://developers.facebook.com/docs/authentication/
  
  @see loginUsingModalWindow 
  @see loginWithPermissions:forSheet:
@@ -128,12 +129,12 @@ extern NSString *MKFacebookDefaultResponseFormat;
 
 
 /*!
- @brief Loads an existing session if available or displays a modal login window.
+ @brief Loads existing access token if available or displays a modal login window.
  
- Tries to load an existing session. If no session is available a modal login window will be displayed. Use this method if you need to display a modal login window while another modal window is already visible.
+ This method performs the same actions as login to attempt to verify an existing access token. If needed a modal login window is displayed.
  
- If a user logs in successfully the session will automatically be saaved to the application NSUSerDefaults.
-
+ Use the modal login window if you need are creating a plugin that requires a modal window.
+ 
  @see login 
  @see loginWithPermissions:forSheet:
 
@@ -145,7 +146,9 @@ extern NSString *MKFacebookDefaultResponseFormat;
 /*!
  @brief Attempts to log a user in using existing session.  If no session is available a login window is diplayed.
  
-  Tries to load existing session. If no session is available a login window will be displayed. If a user logs in successfully the session will automatically be saved to the application NSUserDefaults. See http://wiki.developers.facebook.com/index.php/Extended_permissions for a list of available permissions.
+ Checks to see if there is an access_token available in MKFacebookSession. The access token is verified by sending a synchronous request calling users.getLoggedInUser. If no token is available or the token is not verified a login window will be displayed.
+
+ A list of permissions you can request is available at http://developers.facebook.com/docs/authentication/permissions/
  
  @param permissions List of permisisons to offer the user.
  @param sheet If YES is passed in a NSWindow will be returned, otherwise a login window will appear and nil will be returned.
@@ -162,7 +165,7 @@ extern NSString *MKFacebookDefaultResponseFormat;
 
  @version 0.9 and later
  */
-- (NSWindowController *)loginWithPermissions:(NSArray *)permissions forSheet:(BOOL)sheet;
+- (NSWindow *)loginWithPermissions:(NSArray *)permissions forSheet:(BOOL)sheet;
 
 
 
@@ -192,13 +195,14 @@ extern NSString *MKFacebookDefaultResponseFormat;
 /*!
  @brief Destoys login session.
  
- Removes any saved sessions and invalidates any future requests until a user logs in again.
+ Deletes the access token managed by MKFacebookSession.
+ 
  @version 0.9.0
  */
 - (void)logout;
 
 
-//called from MKLoginWindow after a successful login
+//called from MKLoginWindow after a successful login. Calls the users MKFacebook delegate userLoginSuccessful.
 - (void)userLoginSuccessful;
 
 
