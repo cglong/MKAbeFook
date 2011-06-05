@@ -1,0 +1,3 @@
+[submodule "doxyclean"]
+	path = doxyclean
+	url = git://github.com/mattball/doxyclean.git
