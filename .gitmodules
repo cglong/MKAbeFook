@@ -1,3 +1,6 @@
 [submodule "doxyclean"]
 	path = doxyclean
 	url = git://github.com/mattball/doxyclean.git
+[submodule "SBJson"]
+	path = SBJson
+	url = git://github.com/stig/json-framework.git
