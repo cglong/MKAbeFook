@@ -6,10 +6,10 @@
 //  Copyright 2010 Mike Kinney. All rights reserved.
 //
 
+#import <SBJson/SBJson.h>
 #import "MKFacebookResponseError.h"
 #import "NSXMLDocumentAdditions.h"
 #import "NSXMLElementAdditions.h"
-#import "JSON.h"
 #import "NSDictionaryAdditions.h"
 #import "MKFacebookRequest.h"
 

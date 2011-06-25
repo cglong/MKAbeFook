@@ -16,12 +16,10 @@
  
  */
 
+#import <SBJson/SBJson.h>
 #import "MKLoginWindow.h"
 #import "MKFacebookRequest.h"
 #import "NSXMLElementAdditions.h"
-
-#import "SBJSON.h"
-#import "NSString+SBJSON.h"
 #import "MKFacebookSession.h"
 
 @implementation MKLoginWindow

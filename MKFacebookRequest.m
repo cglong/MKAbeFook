@@ -16,13 +16,13 @@
  
  */
 
+#import <SBJson/SBJson.h>
 #import "MKFacebookRequest.h"
 #import "NSStringExtras.h"
 #import "NSXMLDocumentAdditions.h"
 #import "NSXMLElementAdditions.h"
 #import "MKErrorWindow.h"
 #import "CocoaCryptoHashing.h"
-#import "JSON.h"
 #import "NSDictionaryAdditions.h"
 
 
